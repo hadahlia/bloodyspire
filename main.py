@@ -1,14 +1,17 @@
 #!usr/bin/env python
+import copy
+
 import tcod
 
 from engine import Engine
-from entity import Entity
+# from entity import Entity
+import entity_factory
 # from map import Map
 from procgen import generate_dungeon
 from input import EventHandler
 
 def main() -> None:
-    screen_width = 50
+    screen_width = 100
     screen_height = 80
     
     map_w = 50
@@ -17,6 +20,8 @@ def main() -> None:
     room_max_size = 10
     room_min_size = 6
     max_rooms = 30
+    
+    max_monsters = 3
     
     plyr_x = int(screen_width / 2)
     plyr_y = int(screen_height / 2)
@@ -27,9 +32,7 @@ def main() -> None:
     
     event_handler = EventHandler()
     
-    player = Entity(int(screen_width / 2), int(screen_height / 2), "V", (255,0,100))
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), "@", (0,255,255))
-    entities = {npc, player}
+    player = copy.deepcopy(entity_factory.player)
     
     map = generate_dungeon(
         max_rooms=max_rooms,
@@ -37,10 +40,11 @@ def main() -> None:
         room_max_size=room_max_size,
         map_w=map_w,
         map_h=map_h,
+        max_monsters=max_monsters,
         player=player
     )
     
-    engine = Engine(entities=entities, event_handler=event_handler, map=map, player=player)
+    engine = Engine(event_handler=event_handler, map=map, player=player)
     
     with tcod.context.new_terminal(
 		screen_width,

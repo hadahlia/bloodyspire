@@ -6,6 +6,7 @@ from typing import Iterator, List, Tuple, TYPE_CHECKING
 
 import tcod
 
+import entity_factory
 from map import Map
 import tile_type
 
@@ -39,6 +40,21 @@ class RectRoom:
 			and self.y2 >= other.y1
 		)
 
+def place_entities(
+	room: RectRoom, dungeon: Map, max_monsters: int,
+) -> None:
+    num_monsters = random.randint(0, max_monsters)
+    
+    for i in range(num_monsters):
+        x = random.randint(room.x1 + 1, room.x2 - 1)
+        y = random.randint(room.y1 + 1, room.y2 - 1)
+        
+        if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+            if random.random() < 0.8:
+                entity_factory.shroom.spawn(dungeon, x, y) # weak enemy ! shroomy
+            else:
+                entity_factory.un_knight.spawn(dungeon, x, y) # strong enemy ! undead knight
+
 def tunneler(
 	start: Tuple[int, int], end: Tuple[int, int]
 ) -> Iterator[Tuple[int, int]]:
@@ -62,10 +78,11 @@ def generate_dungeon(
 	room_max_size: int,
 	map_w: int,
 	map_h: int,
+	max_monsters: int,
 	player: Entity,
 ) -> Map:
     """Generates me a lil map :)"""
-    dungeon = Map(map_w, map_h)
+    dungeon = Map(map_w, map_h, entities=[player])
     rooms: List[RectRoom] = []
     for r in range(max_rooms):
         room_w = random.randint(room_min_size, room_max_size)
@@ -86,6 +103,8 @@ def generate_dungeon(
         else:
             for x, y in tunneler(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_type.floor
+        
+        place_entities(new_room, dungeon, max_monsters)
         
         rooms.append(new_room)
     

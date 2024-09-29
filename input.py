@@ -2,7 +2,7 @@ from typing import Optional
 
 import tcod.event
 
-from actions import Action, EscAction, MoveAction
+from actions import Action, BumpAction, EscAction
 
 class EventHandler(tcod.event.EventDispatch[Action]):
     def ev_quit(self, event: tcod.event.Quit) -> Optional[Action]:
@@ -14,13 +14,13 @@ class EventHandler(tcod.event.EventDispatch[Action]):
         key = event.sym
         
         if key == tcod.event.KeySym.w:
-            action = MoveAction(dx=0,dy=-1)
+            action = BumpAction(dx=0,dy=-1)
         elif key == tcod.event.KeySym.s:
-            action = MoveAction(dx=0,dy=1)
+            action = BumpAction(dx=0,dy=1)
         elif key == tcod.event.KeySym.a:
-            action = MoveAction(dx=-1,dy=0)
+            action = BumpAction(dx=-1,dy=0)
         elif key == tcod.event.KeySym.d:
-            action = MoveAction(dx=1,dy=0)
+            action = BumpAction(dx=1,dy=0)
         elif key == tcod.event.KeySym.ESCAPE:
             action = EscAction
         
