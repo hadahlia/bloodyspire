@@ -2,6 +2,7 @@ from typing import Set, Iterable, Any
 
 from tcod.context import Context
 from tcod.console import Console
+from tcod.map import compute_fov
 
 from entity import Entity
 from map import Map
@@ -13,6 +14,7 @@ class Engine:
         self.event_handler = event_handler
         self.map = map
         self.player = player
+        self.update_fov()
         
     def handle_input(self, events: Iterable[Any]) -> None:
         for event in events:
@@ -22,6 +24,16 @@ class Engine:
                 continue
             
             action.perform(self, self.player)
+            
+            self.update_fov()
+    
+    def update_fov(self) -> None:
+        self.map.visible[:] = compute_fov(
+			self.map.tiles["trans"],
+			(self.player.x, self.player.y),
+			radius=8,
+		)
+        self.map.seen |= self.map.visible
     
     def render(self, console: Console, context: Context) -> None:
         self.map.render(console)

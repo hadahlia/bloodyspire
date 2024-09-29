@@ -45,7 +45,7 @@ def tunneler(
 	"""Returns L shape between 2 points."""
 	x1, y1 = start
 	x2, y2 = end
-	if random.random() < 0.3:
+	if random.random() < 0.5:
 		corner_x, corner_y = x2, y1
 	else:
 		corner_x, corner_y = x1, y2
