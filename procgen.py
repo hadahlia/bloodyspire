@@ -11,7 +11,7 @@ from map import Map
 import tile_type
 
 if TYPE_CHECKING:
-	from entity import Entity
+	from engine import Engine
 
 class RectRoom:
 	def __init__(self, x: int, y: int, width: int, height: int) -> None:
@@ -79,10 +79,11 @@ def generate_dungeon(
 	map_w: int,
 	map_h: int,
 	max_monsters: int,
-	player: Entity,
+	engine: Engine,
 ) -> Map:
     """Generates me a lil map :)"""
-    dungeon = Map(map_w, map_h, entities=[player])
+    player = engine.player
+    dungeon = Map(engine, map_w, map_h, entities=[player])
     rooms: List[RectRoom] = []
     for r in range(max_rooms):
         room_w = random.randint(room_min_size, room_max_size)
@@ -99,7 +100,8 @@ def generate_dungeon(
         dungeon.tiles[new_room.inner] = tile_type.floor
         
         if len(rooms) == 0:
-            player.x, player.y = new_room.center
+            player.place(*new_room.center, dungeon)
+            # player.x, player.y = new_room.center
         else:
             for x, y in tunneler(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_type.floor
